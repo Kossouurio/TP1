@@ -21,17 +21,17 @@ private:
 		// Idle, Shooting, Empty, Reloading, 
 		{  0,    1,        0,     1 }, // Idle
 		{  1,    0,        1,     1 }, // Shooting
-		{  0,    0,        0,     1 }, // Empty
-		{  1,    0,        0,     0 }, // Reloading
+		{  1,    0,        0,     1 }, // Empty
+		{  1,    1,        0,     0 }, // Reloading
 	};
 	
-	int mAmmo = 23;
-	int mAmmoCapacity = 23;
-	int mCapacity = 115;
+	int mAmmo = 6;
+	int mAmmoCapacity = 6;
+	int mCapacity = 120;
 	bool mIsReloading = false;
 	bool mIsShooting = false;
-	float mReloadTime = 2.5f;
-	float mShootTime = 0.7f;
+	float mReloadTime = 4.5f;
+	float mShootTime = 2.0f;
 	float mReloadProgress = 0.0f;
 	float mShootProgress = 0.0f;	
 

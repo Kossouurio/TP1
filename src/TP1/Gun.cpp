@@ -1,6 +1,7 @@
 #include "Gun.h"
 #include <iostream>
 #include <conio.h>
+#include <Windows.h>
 #include <cassert>
 
 
@@ -23,27 +24,35 @@ void Gun::Update(float deltatime)
 	case Gun::Idle:
 		mIsReloading = false;
 		mIsShooting = false;
+		mReloadProgress = 0.0f;
+		mShootProgress = 0.0f;
 		break;
 
 	case Gun::Shooting:
-		Shoot();
+		mShootProgress += deltatime;
+
+		if (mShootProgress >= mShootTime)
+		{
+			mShootProgress = 0.0f;
+			mIsShooting = true;
+			Shoot();
+		}
 		break;
 
 	case Gun::Empty:
-		if (mCapacity > 0)
-		{
-			TransitionTo(Gun::Reloading);
-		}
-		else
-		{
-			std::cout << "You have no ammo!" << std::endl;
-			TransitionTo(Gun::Idle);
-		}
-
+		std::cout << "You have no ammo!" << std::endl;
+		std::cout << TransitionTo(Gun::Idle) << std::endl;
 		break;
 
 	case Gun::Reloading:
-		Reload();
+		mReloadProgress += deltatime;
+
+		if (mReloadProgress >= mReloadTime)
+		{
+			mReloadProgress = 0.0f;
+			mIsReloading = true;
+			Reload();
+		}
 		break;
 
 	default:
@@ -55,34 +64,32 @@ void Gun::Update(float deltatime)
 
 void Gun::Shoot()
 {
-	//assert((mAmmo = 0) && "You have no ammo, you need to reload");
-	mIsReloading = false;
-	mIsShooting = true;
-	mAmmo--;
-	std::cout << "Bang! Ammo left: " << mAmmo << std::endl;
-	if (mAmmo == 0)
+	if (mAmmo > 0)
+	{
+		mAmmo -= 1;
+		std::cout << "Bang! Ammo left: " << mAmmo << std::endl;
+	}
+	else
 	{
 		TransitionTo(Gun::Empty);
 	}
+
 }
 
 void Gun::Reload()
 {
-	//assert((mCapacity = 0) && "You have no ammo");
-
-	mIsShooting = false;
-	mIsReloading = true;
-	std::cout << "Reloading..." << std::endl;
-	
-	mReloadProgress += 0.1f;
-
-	if (mReloadProgress >= mReloadTime)
+	if ((mAmmo < mCapacity) && (mAmmo < mAmmoCapacity))
 	{
-		mAmmo = mCapacity;
-		mReloadProgress = 0.0f;
-		std::cout << "Reloaded! Ammo left: " << mAmmo << std::endl;
+		std::cout << "Reloading..." << std::endl;
+		mAmmo += 1;
+		mCapacity -= 1;
+	}
+	else
+	{
+		std::cout << "You are full!" << std::endl;
 		TransitionTo(Gun::Idle);
 	}
+
 }
 
 void Gun::HandleInput()
@@ -90,7 +97,6 @@ void Gun::HandleInput()
 	if (_kbhit())
 	{
 		char key = _getch();
-		std::cout << "Touche pressee : " << key << std::endl;
 		if (key == ' ')
 		{
 			TransitionTo(Gun::Shooting);
@@ -106,6 +112,10 @@ void Gun::HandleInput()
 		if (key == 'q' || key == 'Q')
 		{
 			exit(0);
+		}
+		if (key == 'c' || key == 'C')
+		{
+			std::cout << "Capacity : " << mCapacity << std::endl;
 		}
 	}
 }
